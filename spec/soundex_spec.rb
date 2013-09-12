@@ -6,7 +6,11 @@ describe Soundex do
   describe '.code' do
     it 'should return soundex code of word' do
       Soundex.code('Ackerman').should == 'A265'
+      Soundex.code('Fusedale').should == 'F234'
+      Soundex.code('Grahl').should == 'G640'
+      Soundex.code('Hatchard').should == 'H326'
       Soundex.code('implementation').should == 'I514'
+      Soundex.code('Prewett').should == 'P630'
     end
 
     it 'should add zeros if result less then 4 symbols' do
