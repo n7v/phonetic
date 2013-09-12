@@ -13,11 +13,14 @@ module Phonetic
       return '' if word.empty?
       w = word.upcase
       res = w[0]
+      pg = CODE[w[0].to_sym]
       (1...w.size).each do |i|
-        group = CODE[w[i].to_sym].to_s
-        res += group if !group.empty? && group != res[res.size-1]
+        g = CODE[w[i].to_sym]
+        if g and pg != g
+          res += g.to_s
+          pg = g
+        end
         break if res.size > 3
-        i+=1
       end
       res = res.ljust(4, '0')
       res
