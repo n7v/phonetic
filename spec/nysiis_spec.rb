@@ -1,4 +1,4 @@
-require './nysiis'
+require './lib/nysiis'
 
 include Phonetic
 

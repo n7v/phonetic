@@ -1,4 +1,4 @@
-require './refined_soundex'
+require './lib/refined_soundex'
 
 include Phonetic
 
