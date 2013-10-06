@@ -34,21 +34,26 @@ module Phonetic
       /A$/ => ''
     }
 
-    def self.code(word, options = {trim: true})
-      return '' if !word or word.empty?
+    def self.code_word(word, options = {trim: true})
+      return if !word or word.empty?
       trim = options[:trim]
       w = word.upcase
       w.gsub!(/[^A-Z]/, '')
-      FIRST_CHAR_TABLE.each{|rx, str| break if w.sub!(rx, str) }
-      LAST_CHAR_TABLE.each{|rx, str| w.sub!(rx, str) }
+      return if w.empty?
+      FIRST_CHAR_TABLE.each{ |rx, str| break if w.sub!(rx, str) }
+      LAST_CHAR_TABLE.each{ |rx, str| w.sub!(rx, str) }
       first = w[0]
       w = w[1...w.size].to_s
-      REMAINING_TABLE.each{|rx, str| w.gsub!(rx, str) }
-      LAST_TABLE.each{|rx, str| w.gsub!(rx, str) }
+      REMAINING_TABLE.each{ |rx, str| w.gsub!(rx, str) }
+      LAST_TABLE.each{ |rx, str| w.gsub!(rx, str) }
       w.gsub!(/[^\w\s]|(.)(?=\1)/, '') #remove duplicates
       w = first + w
       w = w[0..5] if trim
       w
+    end
+
+    def self.code(str, options = {trim: true})
+      str.split(/\s+/).map{ |word| code_word(word, options) }.compact.join(' ')
     end
   end
 end

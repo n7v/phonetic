@@ -1,9 +1,9 @@
-require './lib/nysiis'
+require './lib/phonetic/nysiis'
 
 include Phonetic
 
 describe NYSIIS do
-  TABLE = {
+  TEST_TABLE = {
     'Alexandra'     => 'ALAXANDR',
     'Aumont'        => 'AANAD',
     'Bonnie'        => 'BANY',
@@ -35,7 +35,7 @@ describe NYSIIS do
 
   describe '.code' do
     it 'should return NYSIIS code of word' do
-      TABLE.each do |word, result|
+      TEST_TABLE.each do |word, result|
         NYSIIS.code(word, trim: false).should == result
       end
     end
