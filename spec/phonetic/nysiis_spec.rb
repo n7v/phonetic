@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'phonetic/support/nysiis_data'
+require 'support/nysiis_data'
 
 describe Phonetic::NYSIIS do
   describe '.encode' do
