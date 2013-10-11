@@ -1,6 +1,4 @@
-require 'phonetic/core_ext/string/soundex'
-
-include Phonetic
+require 'spec_helper'
 
 describe String do
   describe '.soundex' do
