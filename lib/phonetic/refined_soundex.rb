@@ -1,5 +1,5 @@
 module Phonetic
-  class RefinedSoundex
+  class RefinedSoundex < Algorithm
     CODE = {
       B: 1, P: 1,
       F: 2, V: 2,
@@ -12,7 +12,7 @@ module Phonetic
       R: 9
     }
 
-    def self.code(word)
+    def self.encode_word(word, options = {})
       w = word.upcase
       res = w[0]
       pg = nil

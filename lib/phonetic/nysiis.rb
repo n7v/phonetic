@@ -1,5 +1,7 @@
+require './lib/phonetic/algorithm'
+
 module Phonetic
-  class NYSIIS
+  class NYSIIS < Algorithm
     FIRST_CHAR_TABLE = {
       /^MAC/ => 'MCC',
       /^KN/ => 'NN',
@@ -34,7 +36,7 @@ module Phonetic
       /A$/ => ''
     }
 
-    def self.code_word(word, options = {trim: true})
+    def self.encode_word(word, options = {trim: true})
       return if !word or word.empty?
       trim = options[:trim]
       w = word.upcase
@@ -50,10 +52,6 @@ module Phonetic
       w = first + w
       w = w[0..5] if trim
       w
-    end
-
-    def self.code(str, options = {trim: true})
-      str.split(/\s+/).map{ |word| code_word(word, options) }.compact.join(' ')
     end
   end
 end

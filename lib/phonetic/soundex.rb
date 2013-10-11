@@ -1,5 +1,5 @@
 module Phonetic
-  class Soundex
+  class Soundex < Algorithm
     CODE = { 
       B: 1, P: 1, F: 1, V: 1,
       C: 2, S: 2, K: 2, G: 2, J: 2, Q: 2, X: 2, Z: 2,
@@ -9,7 +9,7 @@ module Phonetic
       R: 6
     }
 
-    def self.code(word)
+    def self.encode_word(word, options = {})
       return '' if word.empty?
       w = word.upcase
       res = w[0]
