@@ -1,2 +1,1 @@
-require 'phonetic/core_ext/string/nysiis'
-require 'phonetic/core_ext/string/soundex'
+Gem.find_files('phonetic/core_ext/string/*.rb').each { |path| require path }
