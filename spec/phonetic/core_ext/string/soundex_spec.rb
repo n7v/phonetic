@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe String do
-  describe '.soundex' do
+  describe '#soundex' do
     it 'should return soundex code of word' do
       'Ackerman'.soundex.should == 'A265'
       'Fusedale'.soundex.should == 'F234'
