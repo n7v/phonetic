@@ -1,4 +1,4 @@
-require './lib/phonetic/algorithm'
+require 'phonetic/algorithm'
 
 include Phonetic
 

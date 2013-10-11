@@ -1,5 +1,5 @@
-require './lib/phonetic/nysiis'
-require './spec/phonetic/support/nysiis_data'
+require 'phonetic/nysiis'
+require 'phonetic/support/nysiis_data'
 
 include Phonetic
 

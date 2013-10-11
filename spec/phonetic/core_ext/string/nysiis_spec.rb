@@ -1,5 +1,5 @@
-require './lib/phonetic/core_ext/string/nysiis'
-require './spec/phonetic/support/nysiis_data'
+require 'phonetic/core_ext/string/nysiis'
+require 'phonetic/support/nysiis_data'
 
 describe String do
   describe '#nysiis' do
