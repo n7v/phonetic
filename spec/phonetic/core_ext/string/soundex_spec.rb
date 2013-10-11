@@ -2,8 +2,8 @@ require 'phonetic/core_ext/string/soundex'
 
 include Phonetic
 
-describe Soundex do
-  describe '.encode' do
+describe String do
+  describe '.soundex' do
     it 'should return soundex code of word' do
       'Ackerman'.soundex.should == 'A265'
       'Fusedale'.soundex.should == 'F234'
