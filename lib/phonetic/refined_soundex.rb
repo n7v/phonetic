@@ -1,3 +1,5 @@
+require 'phonetic/algorithm'
+
 module Phonetic
   class RefinedSoundex < Algorithm
     CODE = {

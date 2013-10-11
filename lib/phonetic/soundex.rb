@@ -1,6 +1,8 @@
+require 'phonetic/algorithm'
+
 module Phonetic
   class Soundex < Algorithm
-    CODE = { 
+    CODE = {
       B: 1, P: 1, F: 1, V: 1,
       C: 2, S: 2, K: 2, G: 2, J: 2, Q: 2, X: 2, Z: 2,
       D: 3, T: 3,

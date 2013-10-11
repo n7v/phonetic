@@ -1,4 +1,4 @@
-require './lib/phonetic/algorithm'
+require 'phonetic/algorithm'
 
 module Phonetic
   class NYSIIS < Algorithm
@@ -36,7 +36,7 @@ module Phonetic
       /A$/ => ''
     }
 
-    def self.encode_word(word, options = {trim: true})
+    def self.encode_word(word, options = { trim: true })
       return if !word or word.empty?
       trim = options[:trim]
       w = word.upcase
@@ -48,7 +48,7 @@ module Phonetic
       w = w[1...w.size].to_s
       REMAINING_TABLE.each{ |rx, str| w.gsub!(rx, str) }
       LAST_TABLE.each{ |rx, str| w.gsub!(rx, str) }
-      w.gsub!(/[^\w\s]|(.)(?=\1)/, '') #remove duplicates
+      w.gsub!(/[^\w\s]|(.)(?=\1)/, '') # remove duplicates
       w = first + w
       w = w[0..5] if trim
       w

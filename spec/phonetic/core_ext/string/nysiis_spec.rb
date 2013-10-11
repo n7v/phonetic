@@ -17,4 +17,4 @@ describe String do
       '1234567890+-= Bess $'.nysiis.should == 'BAS'
     end
   end
-end 
+end

@@ -4,7 +4,7 @@ include Phonetic
 
 describe RefinedSoundex do
   describe '.encode' do
-    it "should return refined soundex code of word" do
+    it 'should return refined soundex code of word' do
       RefinedSoundex.encode('Braz').should == 'B1905'
       RefinedSoundex.encode('Caren').should == 'C30908'
       RefinedSoundex.encode('Hayers').should == 'H093'
