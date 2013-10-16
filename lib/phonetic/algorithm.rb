@@ -5,7 +5,7 @@ module Phonetic
     end
 
     def self.encode(str, options = {})
-      str.split(/\s+/).map do |word|
+      str.scan(/\p{Word}+/).map do |word|
         encode_word(word, options)
       end.compact.reject(&:empty?).join(' ')
     end
