@@ -8,5 +8,9 @@ describe Phonetic::DoubleMetaphone do
         Phonetic::DoubleMetaphone.encode(w).should == r
       end
     end
+
+    it 'should support max size of the code option' do
+      Phonetic::DoubleMetaphone.encode('accede', size: 3).should == ['AKS', 'AKS']
+    end
   end
 end
