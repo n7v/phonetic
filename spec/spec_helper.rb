@@ -1,3 +1,6 @@
+require 'simplecov'
+SimpleCov.start
+
 require 'phonetic'
 
 RSpec.configure do |config|
