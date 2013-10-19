@@ -1,6 +1,13 @@
 require 'phonetic/algorithm'
 
 module Phonetic
+  # Class for encoding string to Refined Soundex code.
+  # A refined soundex code is optimized for spell checking words.
+  #
+  # @example
+  #    Phonetic::RefinedSoundex.encode('Caren')   # => 'C30908'
+  #    Phonetic::RefinedSoundex.encode('Hayers')  # => 'H093'
+  #    Phonetic::RefinedSoundex.encode('Lambard') # => 'L7081096'
   class RefinedSoundex < Algorithm
     CODE = {
       B: 1, P: 1,
@@ -14,6 +21,7 @@ module Phonetic
       R: 9
     }
 
+    # Encode word to its Refined Soundex value
     def self.encode_word(word, options = {})
       w = word.upcase
       res = w[0]
