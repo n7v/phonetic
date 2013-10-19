@@ -1,6 +1,12 @@
 require 'phonetic/algorithm'
 
 module Phonetic
+  # Implementation of Soundex phonetic algorithm.
+  # @example
+  #    Phonetic::Soundex.encode('Ackerman') # => 'A265'
+  #    Phonetic::Soundex.encode('ammonium') # => 'A500'
+  #    Phonetic::Soundex.encode('implementation') # => 'I514'
+
   class Soundex < Algorithm
     CODE = {
       B: 1, P: 1, F: 1, V: 1,
@@ -11,6 +17,7 @@ module Phonetic
       R: 6
     }
 
+    # Convert word to its Soundex code
     def self.encode_word(word, options = {})
       return '' if word.empty?
       w = word.upcase
