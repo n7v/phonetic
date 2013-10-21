@@ -1,11 +1,20 @@
 require 'phonetic/algorithm'
 
 module Phonetic
+  # Metaphone is a phonetic algorithm, published by Lawrence Philips in 1990,
+  # for indexing words by their English pronunciation.
+  # This class implements this algorithm.
+  # @see http://aspell.net/metaphone/metaphone.basic Original Basic code by Lawrence Philips (1990)
+  # @example
+  #    Phonetic::Metaphone.encode('Accola') # => 'AKKL'
+  #    Phonetic::Metaphone.encode('Nikki') # => 'NK'
+  #    Phonetic::Metaphone.encode('Wright') #=> 'RT'
   class Metaphone < Algorithm
     VOWELS = 'AEIOU'
     FRONT_VOWELS = 'EIY'
     VARSON = 'CSPTG'
 
+    # Encode word to its Metaphone code
     def self.encode_word(word, options = { size: 4 })
       code_size = options[:size] || 4
       w = word.upcase.gsub(/[^A-Z]/, '')
