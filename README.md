@@ -1,4 +1,5 @@
 # Phonetic
+[![Gem Version](https://badge.fury.io/rb/phonetic.png)](http://badge.fury.io/rb/phonetic)
 
 Ruby library for phonetic algorithms.
 It supports Soundex, Metaphone, Double Metaphone, Caverphone, NYSIIS and others.
