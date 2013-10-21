@@ -3,9 +3,26 @@
 require 'phonetic/algorithm'
 
 module Phonetic
+  # The Double Metaphone phonetic encoding algorithm is the second generation
+  # of the Metaphone algorithm. Its original implementation was described
+  # by Lawrence Philips in the June 2000 issue of C/C++ Users Journal.
+  #
+  # This implementation based on the PHP implementation by Stephen Woodbridge
+  # and contains modifications of algorithm by Kevin Atkinson.
+  # @see http://swoodbridge.com/DoubleMetaPhone/ PHP implementation by Stephen Woodbridge
+  # @see http://aspell.net/metaphone/dmetaph.cpp C++ implementation with modifications by Kevin Atkinson
+  # @example
+  #    Phonetic::DoubleMetaphone.encode('czerny') # => ['SRN', 'XRN']
+  #    Phonetic::DoubleMetaphone.encode('dumb')   # => ['TM', 'TM']
+  #    Phonetic::DoubleMetaphone.encode('edgar')  # => ['ATKR', 'ATKR']
+  #    # or use alias:
+  #    Phonetic::Metaphone2.encode('czerny') # => ['SRN', 'XRN']
+  #    Phonetic::Metaphone2.encode('dumb')   # => ['TM', 'TM']
+  #    Phonetic::Metaphone2.encode('edgar')  # => ['ATKR', 'ATKR']
   class DoubleMetaphone < Algorithm
     VOWELS = 'AEIOUY'
 
+    # Encode word to its Double Metaphone code.
     def self.encode_word(word, options = { size: 4 })
       code_size = options[:size] || 4
       w = word.strip.upcase
