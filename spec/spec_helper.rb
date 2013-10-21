@@ -1,5 +1,12 @@
+require 'coveralls'
 require 'simplecov'
-SimpleCov.start
+
+if Coveralls.should_run?
+  Coveralls.wear!
+else
+  SimpleCov.start
+end
+
 
 require 'phonetic'
 
