@@ -1,7 +1,8 @@
 require 'phonetic/algorithm'
 
 module Phonetic
-  # Implementation of Soundex phonetic algorithm, which was developed by Robert C. Russell and Margaret K. Odell.
+  # Soundex phonetic algorithm was developed by Robert C. Russell and Margaret K. Odell.
+  # This class implements American Soundex version of algorithm.
   #
   # @example
   #    Phonetic::Soundex.encode('Ackerman') # => 'A265'

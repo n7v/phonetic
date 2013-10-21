@@ -7,7 +7,6 @@ module Phonetic
   # @example
   #    Phonetic::Caverphone2.encode('Stevenson') # => 'STFNSN1111'
   #    Phonetic::Caverphone2.encode('Peter') # => 'PTA1111111'
-
   class Caverphone2 < Algorithm
     MAP = {
       /e$/ => '',
