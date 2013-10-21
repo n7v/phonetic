@@ -1,6 +1,11 @@
 require 'phonetic/algorithm'
 
 module Phonetic
+  # This class implements original version of NYSIIS algorithm.
+  # @example
+  #    Phonetic::NYSIIS.encode('Alexandra') # => 'ALAXANDR'
+  #    Phonetic::NYSIIS.encode('Aumont') # => 'AANAD'
+  #    Phonetic::NYSIIS.encode('Bonnie') # => 'BANY'
   class NYSIIS < Algorithm
     FIRST_CHAR_TABLE = {
       /^MAC/ => 'MCC',
@@ -36,6 +41,7 @@ module Phonetic
       /A$/ => ''
     }
 
+    # Convert word to its NYSIIS code
     def self.encode_word(word, options = { trim: true })
       return if !word or word.empty?
       trim = options[:trim]

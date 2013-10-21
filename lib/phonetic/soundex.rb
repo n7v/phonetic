@@ -7,7 +7,6 @@ module Phonetic
   #    Phonetic::Soundex.encode('Ackerman') # => 'A265'
   #    Phonetic::Soundex.encode('ammonium') # => 'A500'
   #    Phonetic::Soundex.encode('implementation') # => 'I514'
-
   class Soundex < Algorithm
     CODE = {
       B: 1, P: 1, F: 1, V: 1,
