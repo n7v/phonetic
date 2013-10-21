@@ -2,6 +2,7 @@
 [![Build Status](https://travis-ci.org/n7v/phonetic.png)](https://travis-ci.org/n7v/phonetic)
 [![Gem Version](https://badge.fury.io/rb/phonetic.png)](http://badge.fury.io/rb/phonetic)
 [![Coverage Status](https://coveralls.io/repos/n7v/phonetic/badge.png)](https://coveralls.io/r/n7v/phonetic)
+[![Code Climate](https://codeclimate.com/github/n7v/phonetic.png)](https://codeclimate.com/github/n7v/phonetic)
 
 Ruby library for phonetic algorithms.
 It supports Soundex, Metaphone, Double Metaphone, Caverphone, NYSIIS and others.
