@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Phonetic::VERSION
   spec.authors       = ['n7v']
   spec.email         = ['novsem@gmail.com']
-  spec.description   = %q{Ruby library for phonetic algorithms.}
-  spec.summary       = %q{Ruby library for phonetic algorithms. It supports Soundex, Metaphone, Caverphone, NYSIIS and others}
+  spec.description   = %q{Ruby library for phonetic algorithms. It supports Soundex, Metaphone, Caverphone, NYSIIS and others.}
+  spec.summary       = %q{Ruby library for phonetic algorithms.}
   spec.homepage      = 'http://github.com/n7v/phonetic'
   spec.license       = 'MIT'
 
