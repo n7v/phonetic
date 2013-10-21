@@ -1,17 +1,16 @@
 require 'phonetic/algorithm'
 
 module Phonetic
-  # Caverphone 2.0 created by the Caversham Project at the University of Otago.
-  # @see http://caversham.otago.ac.nz/files/working/ctp150804.pdf Caverphone Revisited by David Hood (2004)
+  # Caverphone created by the Caversham Project at the University of Otago.
+  # @see http://caversham.otago.ac.nz/files/working/ctp060902.pdf Caverphone: Phonetic Matching algorithm by David Hood (2002)
   # This class implements this algorithm.
   # @example
-  #    Phonetic::Caverphone2.encode('Stevenson') # => 'STFNSN1111'
-  #    Phonetic::Caverphone2.encode('Peter') # => 'PTA1111111'
-
-  class Caverphone2 < Algorithm
+  #    Phonetic::Caverphone.encode('Charmain') # => 'KMN111'
+  #    Phonetic::Caverphone.encode('Ellett')   # => 'ALT111'
+  #    Phonetic::Caverphone.encode('Siegmund') # => 'SKMNT1'
+  class Caverphone < Algorithm
     MAP = {
-      /e$/ => '',
-      /^(cou|rou|tou|enou|trou)gh/ => '\12f',
+      /^(cou|rou|tou|enou)gh/ => '\12f',
       /^gn/ => '2n',
       /mb$/ => 'mb',
       'cq' => '2q',
@@ -28,10 +27,6 @@ module Phonetic
       'z' => 's',
       /^[aeiou]/ => 'A',
       /[aeiou]/ => '3',
-      'j' => 'y',
-      /^y3/ => 'Y3',
-      /^y/ => 'A',
-      /y/ => '3',
       '3gh3' => '3kh3',
       'gh' => '22',
       'g' => 'k',
@@ -43,28 +38,31 @@ module Phonetic
       /m+/ => 'M',
       /n+/ => 'N',
       'w3' => 'W3',
+      /wy/ => 'Wy',
       'wh3' => 'Wh3',
-      /w$/ => '3',
+      'why' => 'Why',
       'w' => '2',
       /^h/ => 'A',
       'h' => '2',
       'r3' => 'R3',
-      /r$/ => '3',
+      'ry' => 'Ry',
       'r' => '2',
       'l3' => 'L3',
-      /l$/ => '3',
+      'ly' => 'Ly',
       'l' => '2',
+      'j' => 'y',
+      'y3' => 'Y3',
+      'y' => '2',
       '2' => '',
-      /3$/ => 'A',
       '3' => ''
     }
 
-    # Encode word to its Caverphone 2 code
+    # Encode word to its Caverphone code
     def self.encode_word(word, options = {})
       w = word.strip.downcase.gsub(/[^a-z]/, '')
       MAP.each { |r, v| w.gsub!(r, v) }
-      w = w + '1' * 10
-      w[0..9]
+      w = w + '1' * 6
+      w[0..5]
     end
   end
 end
