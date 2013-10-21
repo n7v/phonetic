@@ -1,4 +1,5 @@
 # Phonetic
+[![Build Status](https://travis-ci.org/n7v/phonetic.png)](https://travis-ci.org/n7v/phonetic)
 [![Gem Version](https://badge.fury.io/rb/phonetic.png)](http://badge.fury.io/rb/phonetic)
 
 Ruby library for phonetic algorithms.
