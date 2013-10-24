@@ -81,13 +81,7 @@ module Phonetic
           i += w[i + 1] == 'Q' ? 2 : 1
           code.add 'K', 'K'
         when 'R'
-          # french e.g. 'rogier', but exclude 'hochmeier'
-          if r_french?(w, i, last)
-            code.add '', 'R'
-          else
-            code.add 'R', 'R'
-          end
-          i += w[i + 1] == 'R' ? 2 : 1
+          i += encode_r(w, i, len, code)
         when 'S'
           i += encode_s(w, i, len, code)
         when 'T'
@@ -167,23 +161,22 @@ module Phonetic
     end
 
     def self.encode_d(w, i, len, code)
-      r = 0
+      r = 1
       if w[i, 2] == 'DG'
         if w[i + 2] =~ /[IEY]/
           # e.g. 'edge'
           code.add 'J', 'J'
-          r += 3
+          r += 2
         else
           # e.g. 'edgar'
           code.add 'TK', 'TK'
-          r += 2
+          r += 1
         end
       elsif w[i, 2] =~ /D[TD]/
         code.add 'T', 'T'
-        r += 2
+        r += 1
       else
         code.add 'T', 'T'
-        r += 1
       end
       r
     end
@@ -220,19 +213,17 @@ module Phonetic
     end
 
     def self.encode_h(w, i, len, code)
-      r = 0
+      r = 1
       # only keep if first & before vowel or btw. 2 vowels
       if (i == 0 || i > 0 && vowel?(w[i - 1])) && vowel?(w[i + 1])
         code.add 'H', 'H'
-        r += 2
-      else # also takes care of 'HH'
         r += 1
       end
       r
     end
 
     def self.encode_j(w, i, len, code)
-      r = 0
+      r = 1
       last = len - 1
       # obvious spanish, 'jose', 'san jacinto'
       if w[i, 4] == 'JOSE' || w[0, 4] =~ /SAN\s/
@@ -241,7 +232,6 @@ module Phonetic
         else
           code.add 'J', 'H'
         end
-        r += 1
       else
         if i == 0 && w[i, 4] != 'JOSE'
           code.add 'J', 'A'
@@ -256,13 +246,13 @@ module Phonetic
             code.add 'J', 'J'
           end
         end
-        r += w[i + 1] == 'J' ? 2 : 1
+        r += 1 if w[i + 1] == 'J'
       end
       r
     end
 
     def self.encode_l(w, i, len, code)
-      r = 0
+      r = 1
       if w[i + 1] == 'L'
         # spanish e.g. 'cabrillo', 'gallegos'
         if ll_spanish?(w, i, len)
@@ -270,46 +260,53 @@ module Phonetic
         else
           code.add 'L', 'L'
         end
-        r += 2
+        r += 1
       else
         code.add 'L', 'L'
-        r += 1
       end
       r
     end
 
     def self.encode_m(w, i, len, code)
-      r = 0
+      r = 1
       # 'dumb','thumb'
       r += 1 if i > 0 && w[i - 1, 5] =~ /UMB(  |ER)/ || w[i + 1] == 'M'
-      r += 1
       code.add 'M', 'M'
       r
     end
 
     def self.encode_p(w, i, len, code)
-      r = 0
+      r = 1
       if w[i + 1] == 'H'
         code.add 'F', 'F'
-        r += 2
+        r += 1
       else
         # also account for "campbell", "raspberry"
-        r += w[i + 1] =~ /[PB]/ ? 2 : 1
+        r += 1 if w[i + 1] =~ /[PB]/
         code.add 'P', 'P'
       end
       r
     end
 
+    def self.encode_r(w, i, len, code)
+      last = len - 1
+      # french e.g. 'rogier', but exclude 'hochmeier'
+      if r_french?(w, i, last)
+        code.add '', 'R'
+      else
+        code.add 'R', 'R'
+      end
+      w[i + 1] == 'R' ? 2 : 1
+    end
+
     def self.encode_s(w, i, len, code)
-      r = 0
+      r = 1
       last = len - 1
       # special cases 'island', 'isle', 'carlisle', 'carlysle'
       if i > 0 && w[i - 1, 3] =~ /[IY]SL/
-        r += 1
       # special case 'sugar-'
       elsif i == 0 && w[i, 5] == 'SUGAR'
         code.add 'X', 'S'
-        r += 1
       elsif w[i, 2] == 'SH'
         # germanic
         if w[i + 1, 4] =~ /H(EIM|OEK|OL[MZ])/
@@ -317,7 +314,7 @@ module Phonetic
         else
           code.add 'X', 'X'
         end
-        r += 2
+        r += 1
       # italian & armenian
       elsif w[i, 3] =~ /SI[OA]/
         if !slavo_germanic?(w)
@@ -325,16 +322,16 @@ module Phonetic
         else
           code.add 'S', 'S'
         end
-        r += 3
+        r += 2
       # german & anglicisations, e.g. 'smith' match 'schmidt',
       # 'snider' match 'schneider' also, -sz- in slavic language altho in
       # hungarian it is pronounced 's'
       elsif i == 0 && w[i + 1] =~ /[MNLW]/ || w[i + 1] == 'Z'
         code.add 'S', 'X'
-        r += w[i + 1] == 'Z' ? 2 : 1
+        r += 1 if w[i + 1] == 'Z'
       elsif w[i, 2] == 'SC'
         encode_sc(w, i, code)
-        r += 3
+        r += 2
       # french e.g. 'resnais', 'artois'
       else
         if i == last && i > 1 && w[i - 2, 2] =~ /[AO]I/
@@ -342,16 +339,16 @@ module Phonetic
         else
           code.add 'S', 'S'
         end
-        r += w[i + 1] =~ /[SZ]/ ? 2 : 1
+        r += 1 if w[i + 1] =~ /[SZ]/
       end
       r
     end
 
     def self.encode_t(w, i, len, code)
-      r = 0
+      r = 1
       if w[i, 4] =~ /^(TION|TIA|TCH)/
         code.add 'X', 'X'
-        r += 3
+        r += 2
       elsif w[i, 2] == 'TH' || w[i, 3] == 'TTH'
         # special case 'thomas', 'thames' or germanic
         if w[i + 2, 2] =~ /[OA]M/ || w[0, 4] =~ /^(VAN |VON |SCH)/
@@ -359,9 +356,9 @@ module Phonetic
         else
           code.add '0', 'T'
         end
-        r += 2
+        r += 1
       else
-        r += w[i + 1] =~ /[TD]/ ? 2 : 1
+        r += 1 if w[i + 1] =~ /[TD]/
         code.add 'T', 'T'
       end
       r
@@ -369,11 +366,11 @@ module Phonetic
 
     def self.encode_w(w, i, len, code)
       last = len - 1
-      r = 0
+      r = 1
       # can also be in middle of word
       if w[i, 2] == 'WR'
         code.add 'R', 'R'
-        r += 2
+        r += 1
       else
         if i == 0 && (vowel?(w[i + 1]) || w[i, 2] == 'WH')
           # Wasserman should match Vasserman
@@ -394,17 +391,16 @@ module Phonetic
           code.add 'TS', 'FX'
           r += 3
         end
-        r += 1
       end
       r
     end
 
     def self.encode_z(w, i, len, code)
-      r = 0
+      r = 1
       # chinese pinyin e.g. 'zhao'
       if w[i + 1] == 'H'
         code.add 'J', 'J'
-        r += 2
+        r += 1
       else
         if w[i + 1, 2] =~ /Z[OIA]/ ||
            slavo_germanic?(w) && i > 0 && w[i - 1] != 'T'
@@ -412,7 +408,7 @@ module Phonetic
         else
           code.add 'S', 'S';
         end
-        r += w[i + 1] == 'Z' ? 2 : 1
+        r += 1 if w[i + 1] == 'Z'
       end
       r
     end
