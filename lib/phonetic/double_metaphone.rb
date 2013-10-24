@@ -118,71 +118,18 @@ module Phonetic
         when 'S'
           i += encode_s(w, i, len, code)
         when 'T'
-          if w[i, 4] =~ /^(TION|TIA|TCH)/
-            code.add 'X', 'X'
-            i += 3
-          elsif w[i, 2] == 'TH' || w[i, 3] == 'TTH'
-            # special case 'thomas', 'thames' or germanic
-            if w[i + 2, 2] =~ /[OA]M/ || w[0, 4] =~ /^(VAN |VON |SCH)/
-              code.add 'T', 'T'
-            else
-              code.add '0', 'T'
-            end
-            i += 2
-          else
-            i += w[i + 1] =~ /[TD]/ ? 2 : 1
-            code.add 'T', 'T'
-          end
+          i += encode_t(w, i, len, code)
         when 'V'
           i += w[i + 1] == 'V' ? 2 : 1
           code.add 'F', 'F'
         when 'W'
-          # can also be in middle of word
-          if w[i, 2] == 'WR'
-            code.add 'R', 'R'
-            i += 2
-          else
-            if i == 0 && (vowel?(w[i + 1]) || w[i, 2] == 'WH')
-              # Wasserman should match Vasserman
-              if vowel?(w[i + 1])
-                code.add 'A', 'F'
-              else
-                # need Uomo to match Womo
-                code.add 'A', 'A'
-              end
-            end
-            # Arnow should match Arnoff
-            if i == last && i > 0 && vowel?(w[i - 1]) ||
-               i > 0 && w[i - 1, 5] =~ /EWSKI|EWSKY|OWSKI|OWSKY/ ||
-               w[0, 3] == 'SCH'
-              code.add '', 'F'
-            elsif w[i, 4] =~ /WICZ|WITZ/
-              # polish e.g. 'filipowicz'
-              code.add 'TS', 'FX'
-              i += 3
-            end
-            i += 1
-          end
+          i += encode_w(w, i, len, code)
         when 'X'
           # french e.g. breaux
-          if !x_french?(w, i, last)
-            code.add 'KS', 'KS'
-          end
+          code.add 'KS', 'KS' unless x_french?(w, i, last)
           i += w[i + 1] =~ /[CX]/ ? 2 : 1
         when 'Z'
-          # chinese pinyin e.g. 'zhao'
-          if w[i + 1] == 'H'
-            code.add 'J', 'J'
-            i += 2
-          else
-            if w[i + 1, 2] =~ /Z[OIA]/ ||
-               slavo_germanic?(w) && i > 0 && w[i - 1] != 'T'
-              code.add 'S', 'TS';
-            else
-              code.add 'S', 'S';
-            end
-            i += w[i + 1] == 'Z' ? 2 : 1
-          end
+          i += encode_z(w, i, len, code)
         else
           i += 1
         end
@@ -372,6 +319,76 @@ module Phonetic
           code.add 'S', 'S'
         end
         r += w[i + 1] =~ /[SZ]/ ? 2 : 1
+      end
+      r
+    end
+
+    def self.encode_t(w, i, len, code)
+      r = 0
+      if w[i, 4] =~ /^(TION|TIA|TCH)/
+        code.add 'X', 'X'
+        r += 3
+      elsif w[i, 2] == 'TH' || w[i, 3] == 'TTH'
+        # special case 'thomas', 'thames' or germanic
+        if w[i + 2, 2] =~ /[OA]M/ || w[0, 4] =~ /^(VAN |VON |SCH)/
+          code.add 'T', 'T'
+        else
+          code.add '0', 'T'
+        end
+        r += 2
+      else
+        r += w[i + 1] =~ /[TD]/ ? 2 : 1
+        code.add 'T', 'T'
+      end
+      r
+    end
+
+    def self.encode_w(w, i, len, code)
+      last = len - 1
+      r = 0
+      # can also be in middle of word
+      if w[i, 2] == 'WR'
+        code.add 'R', 'R'
+        r += 2
+      else
+        if i == 0 && (vowel?(w[i + 1]) || w[i, 2] == 'WH')
+          # Wasserman should match Vasserman
+          if vowel?(w[i + 1])
+            code.add 'A', 'F'
+          else
+            # need Uomo to match Womo
+            code.add 'A', 'A'
+          end
+        end
+        # Arnow should match Arnoff
+        if i == last && i > 0 && vowel?(w[i - 1]) ||
+           i > 0 && w[i - 1, 5] =~ /EWSKI|EWSKY|OWSKI|OWSKY/ ||
+           w[0, 3] == 'SCH'
+          code.add '', 'F'
+        elsif w[i, 4] =~ /WICZ|WITZ/
+          # polish e.g. 'filipowicz'
+          code.add 'TS', 'FX'
+          r += 3
+        end
+        r += 1
+      end
+      r
+    end
+
+    def self.encode_z(w, i, len, code)
+      r = 0
+      # chinese pinyin e.g. 'zhao'
+      if w[i + 1] == 'H'
+        code.add 'J', 'J'
+        r += 2
+      else
+        if w[i + 1, 2] =~ /Z[OIA]/ ||
+           slavo_germanic?(w) && i > 0 && w[i - 1] != 'T'
+          code.add 'S', 'TS';
+        else
+          code.add 'S', 'S';
+        end
+        r += w[i + 1] == 'Z' ? 2 : 1
       end
       r
     end
