@@ -20,51 +20,43 @@ module Phonetic
       w = word.upcase.gsub(/[^A-Z]/, '')
       return if w.empty?
       two = w[0, 2]
-      if ['PN', 'AE', 'KN', 'GN', 'WR'].include?(two) then w[0] = '' end
-      if w[0] == 'X' then w[0] = 'S' end
-      if two == 'WH' then w[1] = '' end
+      w[0] = ''  if two =~ /PN|AE|KN|GN|WR/
+      w[0] = 'S' if w[0] == 'X'
+      w[1] = ''  if two == 'WH'
       l = w.size
       metaph = ''
       for n in 0..(l - 1)
         break unless metaph.size < code_size
         symb = w[n]
-        if !(symb != 'C' && n > 0 && w[n - 1] == symb)
+        if symb == 'C' || n == 0 || w[n - 1] != symb
           case
           when vowel?(symb) && n == 0
             metaph = symb
           when symb == 'B'
-            unless n == l - 1 && w[n - 1] == 'M'
-              metaph = metaph + symb
-            end
+            metaph += symb if n != l - 1 || w[n - 1] != 'M'
           when symb == 'C'
-            if !(n > 0 && w[n - 1] == 'S' && front_vowel?(w[n + 1]))
+            if n == 0 || w[n - 1] != 'S' || !front_vowel?(w[n + 1])
               if w[n + 1, 2] == 'IA'
-                metaph = metaph + 'X'
-              else
-                if front_vowel?(w[n + 1])
-                  metaph = metaph + 'S'
+                metaph += 'X'
+              elsif front_vowel?(w[n + 1])
+                metaph += 'S'
+              elsif n > 0 && w[n + 1] == 'H' && w[n - 1] == 'S'
+                metaph += 'K'
+              elsif w[n + 1] == 'H'
+                if n == 0 && !vowel?(w[n + 2])
+                  metaph += 'K'
                 else
-                  if n > 0 && w[n + 1] == 'H' && w[n - 1] == 'S'
-                    metaph = metaph + 'K'
-                  else
-                    if w[n + 1] == 'H'
-                      if n == 0 && !vowel?(w[n + 2])
-                        metaph = metaph + 'K'
-                      else
-                        metaph = metaph + 'X'
-                      end
-                    else
-                      metaph = metaph + 'K'
-                    end
-                  end
+                  metaph += 'X'
                 end
+              else
+                metaph += 'K'
               end
             end
           when symb == 'D'
             if w[n + 1] == 'G' && front_vowel?(w[n + 2])
-              metaph = metaph + 'J'
+              metaph += 'J'
             else
-              metaph = metaph + 'T'
+              metaph += 'T'
             end
           when symb == 'G'
             silent = (w[n + 1] == 'H' && !vowel?(w[n + 2]))
@@ -77,69 +69,51 @@ module Phonetic
             hard = (n > 0 && w[n - 1] == 'G')
             unless silent
               if front_vowel?(w[n + 1]) && !hard
-                metaph = metaph + 'J'
+                metaph += 'J'
               else
-                metaph = metaph + 'K'
+                metaph += 'K'
               end
             end
           when symb == 'H'
             if !(n == l - 1 || (n > 0 && VARSON[w[n - 1]]))
-              if vowel?(w[n + 1])
-                metaph = metaph + 'H'
-              end
+              metaph += 'H' if vowel?(w[n + 1])
             end
-          when 'FJLMNR'[symb]
-            metaph = metaph + symb
+          when symb =~ /[FJLMNR]/
+            metaph += symb
           when symb == 'K'
             if n > 0 && w[n - 1] != 'C'
-              metaph = metaph + 'K'
-            else
-              if n == 0
-                metaph = 'K'
-              end
+              metaph += 'K'
+            elsif n == 0
+              metaph = 'K'
             end
           when symb == 'P'
-            if w[n + 1] == 'H'
-              metaph = metaph + 'F'
-            else
-              metaph = metaph + 'P'
-            end
+            metaph += w[n + 1] == 'H' ? 'F' : 'P'
           when symb == 'Q'
-            metaph = metaph + 'K'
+            metaph += 'K'
           when symb == 'S'
-            if w[n + 1] == 'I' && (w[n + 2] == 'O' || w[n + 2] == 'A')
+            if w[n + 1, 2] =~ /I[OA]/
+              metaph += 'X'
+            elsif w[n + 1] == 'H'
               metaph += 'X'
             else
-              if w[n + 1] == 'H'
-                metaph += 'X'
-              else
-                metaph += 'S'
-              end
+              metaph += 'S'
             end
           when symb == 'T'
-            if w[n + 1] == 'I' && (w[n + 2] == 'O' || w[n + 2] == 'A')
-              metaph = metaph + 'X'
+            if w[n + 1, 2] =~ /I[OA]/
+              metaph += 'X'
+            elsif w[n + 1] == 'H'
+              metaph += '0' if n == 0 || w[n - 1] != 'T'
             else
-              if w[n + 1] == 'H'
-                if !(n > 0 && w[n - 1] == 'T')
-                  metaph = metaph + '0'
-                end
-              else
-                if !(w[n + 1] == 'C' && w[n + 2] == 'H')
-                  metaph = metaph + 'T'
-                end
-              end
+              metaph += 'T' if w[n + 1, 2] != 'CH'
             end
           when symb == 'V'
-            metaph = metaph + 'F'
-          when symb == 'W' || symb == 'Y'
-            if vowel?(w[n + 1])
-              metaph = metaph + symb
-            end
+            metaph += 'F'
+          when symb =~ /[WY]/
+            metaph += symb if vowel?(w[n + 1])
           when symb == 'X'
-            metaph = metaph + 'KS'
+            metaph += 'KS'
           when symb == 'Z'
-            metaph = metaph + 'S'
+            metaph += 'S'
           end
         end
       end
