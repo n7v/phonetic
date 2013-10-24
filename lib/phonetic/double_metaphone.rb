@@ -65,45 +65,18 @@ module Phonetic
         when 'G'
           i += encode_g(w, i, len, code)
         when 'H'
-          # only keep if first & before vowel or btw. 2 vowels
-          if (i == 0 || i > 0 && vowel?(w[i - 1])) && vowel?(w[i + 1])
-            code.add 'H', 'H'
-            i += 2
-          else # also takes care of 'HH'
-            i += 1
-          end
+          i += encode_h(w, i, len, code)
         when 'J'
           i += encode_j(w, i, len, code)
         when 'L'
-          if w[i + 1] == 'L'
-            # spanish e.g. 'cabrillo', 'gallegos'
-            if ll_spanish?(w, i, len)
-              code.add 'L', ''
-            else
-              code.add 'L', 'L'
-            end
-            i += 2
-          else
-            code.add 'L', 'L'
-            i += 1
-          end
+          i += encode_l(w, i, len, code)
         when 'M'
-          # 'dumb','thumb'
-          i += 1 if i > 0 && w[i - 1, 5] =~ /UMB(  |ER)/ || w[i + 1] == 'M'
-          i += 1
-          code.add 'M', 'M'
+          i += encode_m(w, i, len, code)
         when 'Ñ', 'ñ'
-          i += 1
           code.add 'N', 'N'
+          i += 1
         when 'P'
-          if w[i + 1] == 'H'
-            code.add 'F', 'F'
-            i += 2
-          else
-            # also account for "campbell", "raspberry"
-            i += w[i + 1] =~ /[PB]/ ? 2 : 1
-            code.add 'P', 'P'
-          end
+          i += encode_p(w, i, len, code)
         when 'Q'
           i += w[i + 1] == 'Q' ? 2 : 1
           code.add 'K', 'K'
@@ -246,6 +219,18 @@ module Phonetic
       r
     end
 
+    def self.encode_h(w, i, len, code)
+      r = 0
+      # only keep if first & before vowel or btw. 2 vowels
+      if (i == 0 || i > 0 && vowel?(w[i - 1])) && vowel?(w[i + 1])
+        code.add 'H', 'H'
+        r += 2
+      else # also takes care of 'HH'
+        r += 1
+      end
+      r
+    end
+
     def self.encode_j(w, i, len, code)
       r = 0
       last = len - 1
@@ -272,6 +257,45 @@ module Phonetic
           end
         end
         r += w[i + 1] == 'J' ? 2 : 1
+      end
+      r
+    end
+
+    def self.encode_l(w, i, len, code)
+      r = 0
+      if w[i + 1] == 'L'
+        # spanish e.g. 'cabrillo', 'gallegos'
+        if ll_spanish?(w, i, len)
+          code.add 'L', ''
+        else
+          code.add 'L', 'L'
+        end
+        r += 2
+      else
+        code.add 'L', 'L'
+        r += 1
+      end
+      r
+    end
+
+    def self.encode_m(w, i, len, code)
+      r = 0
+      # 'dumb','thumb'
+      r += 1 if i > 0 && w[i - 1, 5] =~ /UMB(  |ER)/ || w[i + 1] == 'M'
+      r += 1
+      code.add 'M', 'M'
+      r
+    end
+
+    def self.encode_p(w, i, len, code)
+      r = 0
+      if w[i + 1] == 'H'
+        code.add 'F', 'F'
+        r += 2
+      else
+        # also account for "campbell", "raspberry"
+        r += w[i + 1] =~ /[PB]/ ? 2 : 1
+        code.add 'P', 'P'
       end
       r
     end
