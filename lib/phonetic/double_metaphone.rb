@@ -50,8 +50,7 @@ module Phonetic
           i += 1
         when 'B'
           # "-mb", e.g", "dumb", already skipped over...
-          code.add 'P', 'P'
-          i += w[i + 1] == 'B' ? 2 : 1
+          i += gen_encode(w, i, 'P', 'P', code)
         when 'Ç', 'ç'
           code.add 'S', 'S'
           i += 1
@@ -60,8 +59,7 @@ module Phonetic
         when 'D'
           i += encode_d(w, i, len, code)
         when 'F', 'K', 'N'
-          code.add w[i], w[i]
-          i += w[i + 1] == w[i] ? 2 : 1
+          i += gen_encode(w, i, w[i], w[i], code)
         when 'G'
           i += encode_g(w, i, len, code)
         when 'H'
@@ -78,8 +76,7 @@ module Phonetic
         when 'P'
           i += encode_p(w, i, len, code)
         when 'Q'
-          i += w[i + 1] == 'Q' ? 2 : 1
-          code.add 'K', 'K'
+          i += gen_encode(w, i, 'K', 'K', code)
         when 'R'
           i += encode_r(w, i, len, code)
         when 'S'
@@ -87,14 +84,11 @@ module Phonetic
         when 'T'
           i += encode_t(w, i, len, code)
         when 'V'
-          i += w[i + 1] == 'V' ? 2 : 1
-          code.add 'F', 'F'
+          i += gen_encode(w, i, 'F', 'F', code)
         when 'W'
           i += encode_w(w, i, len, code)
         when 'X'
-          # french e.g. breaux
-          code.add 'KS', 'KS' unless x_french?(w, i, last)
-          i += w[i + 1] =~ /[CX]/ ? 2 : 1
+          i += encode_x(w, i, len, code)
         when 'Z'
           i += encode_z(w, i, len, code)
         else
@@ -109,6 +103,11 @@ module Phonetic
     end
 
     private
+
+    def self.gen_encode(w, i, primary, secondary, code)
+      code.add primary, secondary
+      w[i + 1] == w[i] ? 2 : 1
+    end
 
     def self.encode_c(w, i, len, code)
       r = 0
@@ -393,6 +392,12 @@ module Phonetic
         end
       end
       r
+    end
+
+    def self.encode_x(w, i, len, code)
+      # french e.g. breaux
+      code.add 'KS', 'KS' unless x_french?(w, i, len - 1)
+      w[i + 1] =~ /[CX]/ ? 2 : 1
     end
 
     def self.encode_z(w, i, len, code)
