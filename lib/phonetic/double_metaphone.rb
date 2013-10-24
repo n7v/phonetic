@@ -36,17 +36,10 @@ module Phonetic
       last = len - 1
       # pad the original string so that we can index beyond the edge of the world
       w += ' ' * 5
-      # skip these when at start of word
-      i += 1 if w[0, 2] =~ /[GKP]N|WR|PS/
-      # initial 'X' is pronounced 'Z' e.g. 'Xavier'
-      if w[0] == 'X'
-        code.add 'S', 'S'
-        i += 1
-      end
+      i += encode_start_of_word(w, code)
       while i < len && (code.first.size < code_size || code.last.size < code_size)
         case w[i]
         when 'A', 'E', 'I', 'O', 'U', 'Y'
-          code.add 'A', 'A' if i == 0 # all init vowels now map to 'A'
           i += 1
         when 'B'
           # "-mb", e.g", "dumb", already skipped over...
@@ -104,39 +97,54 @@ module Phonetic
 
     private
 
+    def self.encode_start_of_word(w, code)
+      i = 0
+      # skip these when at start of word
+      if w[0, 2] =~ /[GKP]N|WR|PS/
+        i = 1
+      # initial 'X' is pronounced 'Z' e.g. 'Xavier'
+      elsif w[0] == 'X'
+        code.add 'S', 'S'
+        i = 1
+      elsif w[0] =~ /[AEIOUY]/
+        code.add 'A', 'A' # all init vowels now map to 'A'
+        i = 1
+      elsif w[0, 6] == 'CAESAR' # special case 'caesar'
+        code.add 'S', 'S'
+        i = 1
+      end
+      i
+    end
+
     def self.gen_encode(w, i, primary, secondary, code)
       code.add primary, secondary
       w[i + 1] == w[i] ? 2 : 1
     end
 
     def self.encode_c(w, i, len, code)
-      r = 0
+      r = 1
       case
       # various germanic
       when c_germanic?(w, i)
         code.add 'K', 'K'
-        r += 2
-      # special case 'caesar'
-      when i == 0 && w[i, 6] == 'CAESAR'
-        code.add 'S', 'S'
-        r += 2
+        r += 1
       when w[i, 2] == 'CH'
         encode_ch(w, i, len, code)
-        r += 2
+        r += 1
       when w[i, 2] == 'CZ' && !(i > 1 && w[i - 2, 4] == 'WICZ')
         # e.g, 'czerny'
         code.add 'S', 'X'
-        r += 2
+        r += 1
       when w[i + 1, 3] == 'CIA'
         # e.g., 'focaccia'
         code.add 'X', 'X'
-        r += 3
+        r += 2
       # double 'C', but not if e.g. 'McClellan'
       when w[i, 2] == 'CC' && !(i == 1 && w[0] == 'M')
-        r += encode_cc(w, i, code) + 2
+        r += encode_cc(w, i, code) + 1
       when w[i, 2] =~ /C[KGQ]/
         code.add 'K', 'K'
-        r += 2
+        r += 1
       when w[i, 2] =~ /C[IEY]/
         # italian vs. english
         if w[i, 3] =~ /CI[OEA]/
@@ -144,15 +152,13 @@ module Phonetic
         else
           code.add 'S', 'S'
         end
-        r += 2
+        r += 1
       else
         code.add 'K', 'K'
         # name sent in 'mac caffrey', 'mac gregor'
         if w[i + 1, 2] =~ /\s[CQG]/
-          r += 3
-        elsif w[i + 1] =~ /[CKQ]/ && w[i + 1, 2] !~ /C[EI]/
           r += 2
-        else
+        elsif w[i + 1] =~ /[CKQ]/ && w[i + 1, 2] !~ /C[EI]/
           r += 1
         end
       end
