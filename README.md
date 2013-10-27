@@ -93,6 +93,13 @@ or use alias:
 'Bonnie'.nysiis # => 'BANY'
 ```
 
+### Daitch–Mokotoff Soundex (D–M Soundex)
+```ruby
+'Anja'.dm_soundex # => ['060000', '064000']
+'Schwarz'.dm_soundex # => ['474000', '479400']
+'Schtolteheim'.dm_soundex # => ['283560']
+```
+
 ## Contributing
 
 1. Fork it
