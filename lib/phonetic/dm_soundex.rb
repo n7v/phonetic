@@ -1,5 +1,6 @@
 require 'phonetic/algorithm'
-require 'phonetic/dm_soundex_map'
+require 'phonetic/dm_soundex/map'
+require 'phonetic/dm_soundex/code'
 
 module Phonetic
   # Daitch–Mokotoff Soundex (D–M Soundex) is a phonetic algorithm invented
@@ -19,7 +20,7 @@ module Phonetic
     def self.encode_word(word, options = {})
       w = word.strip.upcase.gsub(/[^A-Z]+/, '')
       i = 0
-      code = init_code()
+      code = Code.new
       while i < w.size
         if w[i] != w[i + 1]
           c = find_code(MAP, w, i)
@@ -37,28 +38,10 @@ module Phonetic
         end
         i += 1
       end
-      code.result
+      code.results
     end
 
     private
-
-    def self.init_code
-      code = [[]]
-      def code.add(a)
-        case a
-        when Array
-          c = self.map{|w| w.last != a[1] ? w + [a[1]] : w}
-          self.map!{|w| w.last != a[0] ? w + [a[0]] : w}
-          self.push(*c)
-        else
-          self.map!{|w| w.last != a ? w + [a] : w}
-        end
-      end
-      def code.result
-        self.map{|w| w.join[0..5].ljust(6, '0')}.uniq
-      end
-      code
-    end
 
     def self.find_code(map, w, i, last = nil, count = 0)
       elem = map[w[i]]
