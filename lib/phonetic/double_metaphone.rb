@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 require 'phonetic/algorithm'
+require 'phonetic/double_metaphone/code'
 
 module Phonetic
   # The Double Metaphone phonetic encoding algorithm is the second generation
@@ -26,11 +27,7 @@ module Phonetic
     def self.encode_word(word, options = { size: 4 })
       code_size = options[:size] || 4
       w = word.strip.upcase
-      code = ['', '']
-      def code.add(primary, secondary)
-        self[0] += primary
-        self[1] += secondary
-      end
+      code = Code.new
       i = 0
       len = w.size
       last = len - 1
@@ -88,7 +85,7 @@ module Phonetic
           i += 1
         end
       end
-      [code.first[0, code_size], code.last[0, code_size]]
+      code.results(code_size)
     end
 
     def self.encode(str, options = { size: 4 })
@@ -388,7 +385,7 @@ module Phonetic
         end
         # Arnow should match Arnoff
         if i == last && i > 0 && vowel?(w[i - 1]) ||
-           i > 0 && w[i - 1, 5] =~ /EWSKI|EWSKY|OWSKI|OWSKY/ ||
+           i > 0 && w[i - 1, 5] =~ /[EO]WSK[IY]/ ||
            w[0, 3] == 'SCH'
           code.add '', 'F'
         elsif w[i, 4] =~ /WICZ|WITZ/
