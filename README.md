@@ -25,6 +25,10 @@ Or install it yourself as:
 $ gem install phonetic
 ```
 
+## Dependencies
+
+Ruby >= 1.9, JRuby 1.7.6, Rubinius 2.1.1
+
 ## Usage
 
 ```ruby
