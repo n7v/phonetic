@@ -1,12 +1,13 @@
 require 'coveralls'
 require 'simplecov'
 
-if Coveralls.should_run?
-  Coveralls.wear!
-else
-  SimpleCov.start
+if RUBY_ENGINE == 'ruby'
+  if Coveralls.should_run?
+    Coveralls.wear!
+  else
+    SimpleCov.start
+  end
 end
-
 
 require 'phonetic'
 
