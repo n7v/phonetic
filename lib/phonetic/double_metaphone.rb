@@ -26,17 +26,17 @@ module Phonetic
     START_OF_WORD_MAP = {
       # skip these when at start of word
       /^([GKP]N|WR|PS)/ => ['', '', 1],
-       # initial 'X' is pronounced 'Z' e.g. 'Xavier'
+      # initial 'X' is pronounced 'Z' e.g. 'Xavier'
       /^X/ => ['S', 'S', 1],
-       # all init vowels now map to 'A'
+      # all init vowels now map to 'A'
       /^[AEIOUY]/ => ['A', 'A', 1],
-       # special case 'caesar'
+      # special case 'caesar'
       /^CAESAR/ => ['S', 'S', 1],
       # special case 'sugar-'
       /^SUGAR/ => ['X', 'S', 1],
       # -ges-, -gep-, -gel-, -gie- at beginning
       /^G(Y|E[SPBLYIR]|I[BLNE])/ => ['K', 'J', 2],
-       # keep H if first & before vowel
+      # keep H if first & before vowel
       /^H[AEIOUY]/ => ['H', 'H', 2],
       # german & anglicisations, e.g. 'smith' match 'schmidt', 'snider' match 'schneider'
       /^S[MNLW]/ => ['S', 'X', 1],
