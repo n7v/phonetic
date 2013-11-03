@@ -23,6 +23,34 @@ module Phonetic
   #    Phonetic::Metaphone2.encode('dumb')   # => ['TM', 'TM']
   #    Phonetic::Metaphone2.encode('edgar')  # => ['ATKR', 'ATKR']
   class DoubleMetaphone < Algorithm
+    START_OF_WORD_MAP = {
+      # skip these when at start of word
+      /^([GKP]N|WR|PS)/ => ['', '', 1],
+       # initial 'X' is pronounced 'Z' e.g. 'Xavier'
+      /^X/ => ['S', 'S', 1],
+       # all init vowels now map to 'A'
+      /^[AEIOUY]/ => ['A', 'A', 1],
+       # special case 'caesar'
+      /^CAESAR/ => ['S', 'S', 1],
+      # special case 'sugar-'
+      /^SUGAR/ => ['X', 'S', 1],
+      # -ges-, -gep-, -gel-, -gie- at beginning
+      /^G(Y|E[SPBLYIR]|I[BLNE])/ => ['K', 'J', 2],
+       # keep H if first & before vowel
+      /^H[AEIOUY]/ => ['H', 'H', 2],
+      # german & anglicisations, e.g. 'smith' match 'schmidt', 'snider' match 'schneider'
+      /^S[MNLW]/ => ['S', 'X', 1],
+      # ghislane, ghiradelli
+      /^GHI/ => ['J', 'J', 2],
+      /^GH/ => ['K', 'K', 2],
+      # greek roots e.g. 'chemistry', 'chorus'
+      /^CH(ARAC|ARIS|OR[^E]|YM|EM)/ => ['K', 'K', 2],
+      # Wasserman should match Vasserman
+      /^W[AEIOUY]/ => ['A', 'F', 0],
+      # need Uomo to match Womo
+      /^WH/ => ['A', 'A', 0]
+    }
+
     # Encode word to its Double Metaphone code.
     def self.encode_word(word, options = { size: 4 })
       code_size = options[:size] || 4
@@ -96,19 +124,12 @@ module Phonetic
 
     def self.encode_start_of_word(w, code)
       i = 0
-      # skip these when at start of word
-      if w[0, 2] =~ /[GKP]N|WR|PS/
-        i = 1
-      # initial 'X' is pronounced 'Z' e.g. 'Xavier'
-      elsif w[0] == 'X'
-        code.add 'S', 'S'
-        i = 1
-      elsif w[0] =~ /[AEIOUY]/
-        code.add 'A', 'A' # all init vowels now map to 'A'
-        i = 1
-      elsif w[0, 6] == 'CAESAR' # special case 'caesar'
-        code.add 'S', 'S'
-        i = 1
+      START_OF_WORD_MAP.each do |r, v|
+        if w =~ r
+          code.add v[0], v[1]
+          i = v[2]
+          break
+        end
       end
       i
     end
@@ -192,9 +213,6 @@ module Phonetic
       # 'tagliaro'
       elsif w[i + 1, 2] == 'LI' && !slavo_germanic?(w)
         code.add 'KL', 'L'
-      # -ges-, -gep-, -gel-, -gie- at beginning
-      elsif i == 0 && w[1, 2] =~ /^Y|E[SPBLYIR]|I[BLNE]/
-        code.add 'K', 'J'
       # -ger-,  -gy-
       elsif g_ger_or_gy?(w, i)
         code.add 'K', 'J'
@@ -216,8 +234,8 @@ module Phonetic
 
     def self.encode_h(w, i, len, code)
       r = 1
-      # only keep if first & before vowel or btw. 2 vowels
-      if (i == 0 || i > 0 && vowel?(w[i - 1])) && vowel?(w[i + 1])
+      # keep if btw. 2 vowels
+      if i > 0 && vowel?(w[i - 1]) && vowel?(w[i + 1])
         code.add 'H', 'H'
         r += 1
       end
@@ -306,9 +324,6 @@ module Phonetic
       last = len - 1
       # special cases 'island', 'isle', 'carlisle', 'carlysle'
       if i > 0 && w[i - 1, 3] =~ /[IY]SL/
-      # special case 'sugar-'
-      elsif i == 0 && w[i, 5] == 'SUGAR'
-        code.add 'X', 'S'
       elsif w[i, 2] == 'SH'
         # germanic
         if w[i + 1, 4] =~ /H(EIM|OEK|OL[MZ])/
@@ -325,12 +340,10 @@ module Phonetic
           code.add 'S', 'S'
         end
         r += 2
-      # german & anglicisations, e.g. 'smith' match 'schmidt',
-      # 'snider' match 'schneider' also, -sz- in slavic language altho in
-      # hungarian it is pronounced 's'
-      elsif i == 0 && w[i + 1] =~ /[MNLW]/ || w[i + 1] == 'Z'
+      # -sz- in slavic language altho in hungarian it is pronounced 's'
+      elsif w[i, 2] == 'SZ'
         code.add 'S', 'X'
-        r += 1 if w[i + 1] == 'Z'
+        r += 1
       elsif w[i, 2] == 'SC'
         encode_sc(w, i, code)
         r += 2
@@ -374,15 +387,6 @@ module Phonetic
         code.add 'R', 'R'
         r += 1
       else
-        if i == 0 && (vowel?(w[i + 1]) || w[i, 2] == 'WH')
-          # Wasserman should match Vasserman
-          if vowel?(w[i + 1])
-            code.add 'A', 'F'
-          else
-            # need Uomo to match Womo
-            code.add 'A', 'A'
-          end
-        end
         # Arnow should match Arnoff
         if i == last && i > 0 && vowel?(w[i - 1]) ||
            i > 0 && w[i - 1, 5] =~ /[EO]WSK[IY]/ ||
@@ -429,9 +433,6 @@ module Phonetic
       # find 'michael'
       when i > 0 && w[i, 4] == 'CHAE'
         code.add 'K', 'X'
-      # greek roots e.g. 'chemistry', 'chorus'
-      when ch_greek_roots?(w, i)
-        code.add 'K', 'K'
       # germanic, greek, or otherwise 'ch' for 'kh' sound
       when ch_germanic_or_greek?(w, i, len)
         code.add 'K', 'K'
@@ -467,17 +468,10 @@ module Phonetic
     def self.encode_gh(w, i, code)
       if i > 0 && !vowel?(w[i - 1])
         code.add 'K', 'K'
-      elsif i == 0
-        # ghislane, ghiradelli
-        if w[i + 2] == 'I'
-          code.add 'J', 'J'
-        else
-          code.add 'K', 'K'
-        end
       # Parker's rule (with some further refinements)
       elsif !(i > 1 && w[i - 2] =~ /[BHD]/ || # e.g., 'hugh'
               i > 2 && w[i - 3] =~ /[BHD]/ || # e.g., 'bough'
-              i > 3 && w[i - 4] =~ /[BH]/)  # e.g., 'broughton'
+              i > 3 && w[i - 4] =~ /[BH]/)    # e.g., 'broughton'
         # e.g., 'laugh', 'McLaughlin', 'cough', 'gough', 'rough', 'tough'
         if i > 2 && w[i - 1] == 'U' && w[i - 3] =~ /[CGLRT]/
           code.add 'F', 'F'
@@ -533,11 +527,6 @@ module Phonetic
       !vowel?(w[i - 2]) &&
       w[i - 1, 3] == 'ACH' &&
       (w[i + 2] !~ /[IE]/ || w[i - 2, 6] =~ /[BM]ACHER/)
-    end
-
-    def self.ch_greek_roots?(w, i)
-      # greek roots e.g. 'chemistry', 'chorus'
-      i == 0 && w[1, 5] =~ /^H(ARAC|ARIS|OR|YM|IA|EM)/ && w[0, 5] != 'CHORE'
     end
 
     def self.ch_germanic_or_greek?(w, i, len)
