@@ -98,7 +98,16 @@ or use alias:
 'Bonnie'.nysiis # => 'BANY'
 ```
 
+### Refined NYSIIS
+
+```ruby
+'Aumont'.refined_nysiis  # => 'ANAD'
+'Phoenix'.refined_nysiis # => 'FANAC'
+'Schmidt'.refined_nysiis # => 'SNAD'
+```
+
 ### Daitch–Mokotoff Soundex (D–M Soundex)
+
 ```ruby
 'Anja'.dm_soundex # => ['060000', '064000']
 'Schwarz'.dm_soundex # => ['474000', '479400']

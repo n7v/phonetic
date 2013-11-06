@@ -135,7 +135,7 @@ module Phonetic
       when w[i, 2] == 'CH'
         r += encode_ch(w, i, len, code)
       when w[i, 2] == 'CZ' && !(i > 1 && w[i - 2, 4] == 'WICZ')
-         # e.g, 'czerny'
+        # e.g, 'czerny'
         code.add 'S', 'X'
         r += 1
       when w[i + 1, 3] == 'CIA'

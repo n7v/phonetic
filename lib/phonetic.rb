@@ -1,5 +1,6 @@
 require 'phonetic/version'
 require 'phonetic/nysiis'
+require 'phonetic/refined_nysiis'
 require 'phonetic/soundex'
 require 'phonetic/refined_soundex'
 require 'phonetic/metaphone'

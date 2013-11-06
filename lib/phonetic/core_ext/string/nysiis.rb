@@ -1,7 +1,7 @@
 require 'phonetic/nysiis'
 
 class String
-  # Caverphone value of string.
+  # NYSIIS value of string.
   # @example
   #    'Alexandra'.nysiis # => 'ALAXANDR'
   #    'Aumont'.nysiis # => 'AANAD'
