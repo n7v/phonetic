@@ -133,10 +133,9 @@ module Phonetic
         code.add 'K', 'K'
         r += 1
       when w[i, 2] == 'CH'
-        encode_ch(w, i, len, code)
-        r += 1
+        r += encode_ch(w, i, len, code)
       when w[i, 2] == 'CZ' && !(i > 1 && w[i - 2, 4] == 'WICZ')
-        # e.g, 'czerny'
+         # e.g, 'czerny'
         code.add 'S', 'X'
         r += 1
       when w[i + 1, 3] == 'CIA'
@@ -149,13 +148,12 @@ module Phonetic
       when w[i, 2] =~ /C[KGQ]/
         code.add 'K', 'K'
         r += 1
+      # italian vs. english
+      when w[i, 3] =~ /CI[OEA]/
+        code.add 'S', 'X'
+        r += 1
       when w[i, 2] =~ /C[IEY]/
-        # italian vs. english
-        if w[i, 3] =~ /CI[OEA]/
-          code.add 'S', 'X'
-        else
-          code.add 'S', 'S'
-        end
+        code.add 'S', 'S'
         r += 1
       else
         code.add 'K', 'K'
@@ -171,17 +169,16 @@ module Phonetic
 
     def self.encode_d(w, i, len, code)
       r = 1
-      if w[i, 2] == 'DG'
-        if w[i + 2] =~ /[IEY]/
-          # e.g. 'edge'
-          code.add 'J', 'J'
-          r += 2
-        else
-          # e.g. 'edgar'
-          code.add 'TK', 'TK'
-          r += 1
-        end
-      elsif w[i, 2] =~ /D[TD]/
+      case
+      when w[i + 1, 2] =~ /G[IEY]/
+        # e.g. 'edge'
+        code.add 'J', 'J'
+        r += 2
+      when w[i + 1] == 'G'
+        # e.g. 'edgar'
+        code.add 'TK', 'TK'
+        r += 1
+      when w[i + 1] =~ /[TD]/
         code.add 'T', 'T'
         r += 1
       else
@@ -192,19 +189,19 @@ module Phonetic
 
     def self.encode_g(w, i, len, code)
       r = 2
-      if w[i + 1] == 'H'
+      case
+      when w[i + 1] == 'H'
         encode_gh(w, i, code)
-      elsif w[i + 1] == 'N'
+      when w[i + 1] == 'N'
         encode_gn(w, i, code)
       # 'tagliaro'
-      elsif w[i + 1, 2] == 'LI' && !slavo_germanic?(w)
+      when w[i + 1, 2] == 'LI' && !slavo_germanic?(w)
         code.add 'KL', 'L'
       # -ger-,  -gy-
-      elsif g_ger_or_gy?(w, i)
+      when g_ger_or_gy?(w, i)
         code.add 'K', 'J'
-      # italian e.g, 'biaggi'
-      elsif w[i + 1] =~ /[EIY]/ || (i > 0 && w[i - 1, 4] =~ /[AO]GGI/)
-        if w[0, 4] =~ /^(VAN |VON |SCH)/ || w[i + 1, 2] == 'ET'
+      when g_italian?(w, i)
+        if w[0, 4] =~ /^(V[AO]N\s|SCH)/ || w[i + 1, 2] == 'ET'
           code.add 'K', 'K'
         elsif w[i + 1, 4] =~ /IER\s/
           code.add 'J', 'J'
@@ -308,18 +305,13 @@ module Phonetic
     def self.encode_s(w, i, len, code)
       r = 1
       last = len - 1
+      case
       # special cases 'island', 'isle', 'carlisle', 'carlysle'
-      if i > 0 && w[i - 1, 3] =~ /[IY]SL/
-      elsif w[i, 2] == 'SH'
-        # germanic
-        if w[i + 1, 4] =~ /H(EIM|OEK|OL[MZ])/
-          code.add 'S', 'S'
-        else
-          code.add 'X', 'X'
-        end
-        r += 1
+      when i > 0 && w[i - 1, 3] =~ /[IY]SL/
+      when w[i, 2] == 'SH'
+        r += encode_sh(w, i, code)
       # italian & armenian
-      elsif w[i, 3] =~ /SI[OA]/
+      when w[i, 3] =~ /SI[OA]/
         if !slavo_germanic?(w)
           code.add 'S', 'X'
         else
@@ -327,15 +319,13 @@ module Phonetic
         end
         r += 2
       # -sz- in slavic language altho in hungarian it is pronounced 's'
-      elsif w[i, 2] == 'SZ'
+      when w[i, 2] == 'SZ'
         code.add 'S', 'X'
         r += 1
-      elsif w[i, 2] == 'SC'
-        encode_sc(w, i, code)
-        r += 2
-      # french e.g. 'resnais', 'artois'
+      when w[i, 2] == 'SC'
+        r += encode_sc(w, i, code)
       else
-        if i == last && i > 1 && w[i - 2, 2] =~ /[AO]I/
+        if s_french?(w, i, last)
           code.add '', 'S'
         else
           code.add 'S', 'S'
@@ -430,6 +420,7 @@ module Phonetic
       else
         code.add 'X', 'K'
       end
+      1
     end
 
     def self.encode_cc(w, i, code)
@@ -459,7 +450,7 @@ module Phonetic
               i > 2 && w[i - 3] =~ /[BHD]/ || # e.g., 'bough'
               i > 3 && w[i - 4] =~ /[BH]/)    # e.g., 'broughton'
         # e.g., 'laugh', 'McLaughlin', 'cough', 'gough', 'rough', 'tough'
-        if i > 2 && w[i - 1] == 'U' && w[i - 3] =~ /[CGLRT]/
+        if i > 2 && w[i - 3, 3] =~ /[CGLRT].U/
           code.add 'F', 'F'
         elsif i > 0 && w[i - 1] != 'I'
           code.add 'K', 'K'
@@ -476,6 +467,16 @@ module Phonetic
       else
         code.add 'KN', 'KN'
       end
+    end
+
+    def self.encode_sh(w, i, code)
+      # germanic
+      if w[i + 1, 4] =~ /H(EIM|OEK|OL[MZ])/
+        code.add 'S', 'S'
+      else
+        code.add 'X', 'X'
+      end
+      1
     end
 
     def self.encode_sc(w, i, code)
@@ -497,6 +498,7 @@ module Phonetic
       else
         code.add 'SK', 'SK'
       end
+      2
     end
 
     def self.slavo_germanic?(w)
@@ -509,10 +511,7 @@ module Phonetic
 
     def self.c_germanic?(w, i)
       # various germanic
-      i > 1 &&
-      !vowel?(w[i - 2]) &&
-      w[i - 1, 3] == 'ACH' &&
-      (w[i + 2] !~ /[IE]/ || w[i - 2, 6] =~ /[BM]ACHER/)
+      i > 1 && w[i - 2, 6] =~ /(^[^AEIOUY]ACH[^IE])|([BM]ACHER)/
     end
 
     def self.ch_germanic_or_greek?(w, i, len)
@@ -534,6 +533,11 @@ module Phonetic
       !(i > 0 && w[i - 1, 3] =~ /[RO]GY/)
     end
 
+    def self.g_italian?(w, i)
+      # italian e.g, 'biaggi'
+      w[i + 1] =~ /[EIY]/ || (i > 0 && w[i - 1, 4] =~ /[AO]GGI/)
+    end
+
     def self.j_spanish_pron?(w, i)
       # spanish pron. of e.g. 'bajador'
       i > 0 && vowel?(w[i - 1]) && !slavo_germanic?(w) && w[i + 1] =~ /[AO]/
@@ -552,6 +556,11 @@ module Phonetic
       i == last && !slavo_germanic?(w) &&
       i > 1 && w[i - 2, 2] == 'IE' &&
       !(i > 3 && w[i - 4, 2] =~ /M[EA]/)
+    end
+
+    def self.s_french?(w, i, last)
+      # french e.g. 'resnais', 'artois'
+      i == last && i > 1 && w[i - 2, 2] =~ /[AO]I/
     end
 
     def self.x_french?(w, i, last)

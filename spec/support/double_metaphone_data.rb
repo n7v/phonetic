@@ -96,6 +96,7 @@ module Phonetic
     'Katerine'     => ['KTRN', 'KTRN'],
     'Khia'         => ['K', 'K'],
     'Knight'       => ['NT', 'NT'],
+    'laczo'        => ['LS', 'LX'],
     'laugh'        => ['LF', 'LF'],
     'Lawrence'     => ['LRNS', 'LRNS'],
     'Loretta'      => ['LRT', 'LRT'],
