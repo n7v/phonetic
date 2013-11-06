@@ -72,22 +72,12 @@ module Phonetic
         when 'Ç', 'ç'
           code.add 'S', 'S'
           i += 1
-        when 'C'
-          i += encode_c(w, i, len, code)
-        when 'D'
-          i += encode_d(w, i, len, code)
+        when 'C', 'D'
+          i += char_encode(w, i, len, code)
         when 'F', 'K', 'N'
           i += gen_encode(w, i, w[i], w[i], code)
-        when 'G'
-          i += encode_g(w, i, len, code)
-        when 'H'
-          i += encode_h(w, i, len, code)
-        when 'J'
-          i += encode_j(w, i, len, code)
-        when 'L'
-          i += encode_l(w, i, len, code)
-        when 'M'
-          i += encode_m(w, i, len, code)
+        when 'G', 'H', 'J', 'L', 'M'
+          i += char_encode(w, i, len, code)
         when 'Ñ', 'ñ'
           code.add 'N', 'N'
           i += 1
@@ -95,20 +85,12 @@ module Phonetic
           i += encode_p(w, i, len, code)
         when 'Q'
           i += gen_encode(w, i, 'K', 'K', code)
-        when 'R'
-          i += encode_r(w, i, len, code)
-        when 'S'
-          i += encode_s(w, i, len, code)
-        when 'T'
-          i += encode_t(w, i, len, code)
+        when 'R', 'S', 'T'
+          i += char_encode(w, i, len, code)
         when 'V'
           i += gen_encode(w, i, 'F', 'F', code)
-        when 'W'
-          i += encode_w(w, i, len, code)
-        when 'X'
-          i += encode_x(w, i, len, code)
-        when 'Z'
-          i += encode_z(w, i, len, code)
+        when 'W', 'X', 'Z'
+          i += char_encode(w, i, len, code)
         else
           i += 1
         end
@@ -137,6 +119,10 @@ module Phonetic
     def self.gen_encode(w, i, primary, secondary, code)
       code.add primary, secondary
       w[i + 1] == w[i] ? 2 : 1
+    end
+
+    def self.char_encode(w, i, len, code)
+      self.send "encode_#{w[i].downcase}", w, i, len, code
     end
 
     def self.encode_c(w, i, len, code)
