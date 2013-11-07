@@ -1,6 +1,8 @@
 module Phonetic
   NYSIIS_TEST_TABLE = {
+    'acknowledge'   => 'ACNALADG',
     'Alexandra'     => 'ALAXANDR',
+    'Alphonso'      => 'ALFANS',
     'Aumont'        => 'AANAD',
     'Bonnie'        => 'BANY',
     'Christensen'   => 'CHRASTANSAN',
@@ -18,14 +20,16 @@ module Phonetic
     'Knuth'         => 'NNAT',
     'Kepler'        => 'CAPLAR',
     'Marguerite'    => 'MARGARAT',
-    'Smith'         => 'SNAT',
-    'Schelte'       => 'SSALT',
     'Macdonald'     => 'MCDANALD',
     'Michael'       => 'MACAL',
     'Phoenix'       => 'FFANAX',
+    'pizza'         => 'PAS',
     'Pfeiffer'      => 'FFAFAR',
     'Rebecca'       => 'RABAC',
     'Rosalind'      => 'RASALAD',
-    'Schmidt'       => 'SSNAD'
+    'Schmidt'       => 'SSNAD',
+    'Schelte'       => 'SSALT',
+    'Smith'         => 'SNAT',
+    'weschsler'     => 'WASLAR'
   }
 end
