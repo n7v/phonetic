@@ -25,25 +25,20 @@ module Phonetic
       w[1] = ''  if two == 'WH'
       l = w.size
       metaph = ''
-      for n in 0..(l - 1)
-        break unless metaph.size < code_size
+      n = 0
+      if vowel?(w[0])
+        metaph = w[0]
+        n = 1
+      end
+      while n < l && metaph.size < code_size
         symb = w[n]
-        next unless symb == 'C' || n == 0 || w[n - 1] != symb
-        if vowel?(symb) && n == 0
-          metaph = symb
+        if duplicate?(w, n)
+          n += 1
           next
         end
         case symb
-        when 'B'
-          metaph += symb if n != l - 1 || w[n - 1] != 'M'
-        when 'C'
-          metaph += encode_c(w, n)
-        when 'D'
-          metaph += encode_d(w, n)
-        when 'G'
-          metaph += encode_g(w, n)
-        when 'H'
-          metaph += encode_h(w, n)
+        when /[BCDGH]/
+          metaph += gen_encode(w, n)
         when /[FJLMNR]/
           metaph += symb
         when 'K'
@@ -52,10 +47,8 @@ module Phonetic
           metaph += w[n + 1] == 'H' ? 'F' : 'P'
         when 'Q'
           metaph += 'K'
-        when 'S'
-          metaph += encode_s(w, n)
-        when 'T'
-          metaph += encode_t(w, n)
+        when /[ST]/
+          metaph += gen_encode(w, n)
         when 'V'
           metaph += 'F'
         when /[WY]/
@@ -65,6 +58,7 @@ module Phonetic
         when 'Z'
           metaph += 'S'
         end
+        n += 1
       end
       metaph
     end
@@ -79,6 +73,18 @@ module Phonetic
     def self.front_vowel?(symbol)
       v = FRONT_VOWELS[symbol.to_s]
       !v.nil? && !v.empty?
+    end
+
+    def self.duplicate?(w, n)
+      w[n] != 'C' && n > 0 && w[n - 1] == w[n]
+    end
+
+    def self.gen_encode(w, n)
+      self.send "encode_#{w[n].downcase}", w, n
+    end
+
+    def self.encode_b(w, n)
+      n != w.size - 1 || w[n - 1] != 'M' ? w[n] : ''
     end
 
     def self.encode_c(w, n)
