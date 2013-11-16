@@ -29,38 +29,40 @@ module Phonetic
         break unless metaph.size < code_size
         symb = w[n]
         next unless symb == 'C' || n == 0 || w[n - 1] != symb
-        case
-        when vowel?(symb) && n == 0
+        if vowel?(symb) && n == 0
           metaph = symb
-        when symb == 'B'
+          next
+        end
+        case symb
+        when 'B'
           metaph += symb if n != l - 1 || w[n - 1] != 'M'
-        when symb == 'C'
+        when 'C'
           metaph += encode_c(w, n)
-        when symb == 'D'
+        when 'D'
           metaph += encode_d(w, n)
-        when symb == 'G'
+        when 'G'
           metaph += encode_g(w, n)
-        when symb == 'H'
+        when 'H'
           metaph += encode_h(w, n)
-        when symb =~ /[FJLMNR]/
+        when /[FJLMNR]/
           metaph += symb
-        when symb == 'K'
+        when 'K'
           metaph += encode_k(w, n)
-        when symb == 'P'
+        when 'P'
           metaph += w[n + 1] == 'H' ? 'F' : 'P'
-        when symb == 'Q'
+        when 'Q'
           metaph += 'K'
-        when symb == 'S'
+        when 'S'
           metaph += encode_s(w, n)
-        when symb == 'T'
+        when 'T'
           metaph += encode_t(w, n)
-        when symb == 'V'
+        when 'V'
           metaph += 'F'
-        when symb =~ /[WY]/
+        when /[WY]/
           metaph += symb if vowel?(w[n + 1])
-        when symb == 'X'
+        when 'X'
           metaph += 'KS'
-        when symb == 'Z'
+        when 'Z'
           metaph += 'S'
         end
       end
@@ -82,18 +84,15 @@ module Phonetic
     def self.encode_c(w, n)
       metaph = ''
       if n == 0 || w[n - 1] != 'S' || !front_vowel?(w[n + 1])
-        if w[n + 1, 2] == 'IA'
+        case
+        when w[n + 1, 2] == 'IA'
           metaph = 'X'
-        elsif front_vowel?(w[n + 1])
+        when front_vowel?(w[n + 1])
           metaph = 'S'
-        elsif n > 0 && w[n + 1] == 'H' && w[n - 1] == 'S'
+        when n > 0 && w[n - 1, 3] == 'SCH'
           metaph = 'K'
-        elsif w[n + 1] == 'H'
-          if n == 0 && !vowel?(w[n + 2])
-            metaph = 'K'
-          else
-            metaph = 'X'
-          end
+        when w[n + 1] == 'H'
+          metaph = (n == 0 && !vowel?(w[n + 2])) ? 'K' : 'X'
         else
           metaph = 'K'
         end
@@ -108,19 +107,11 @@ module Phonetic
     def self.encode_g(w, n)
       metaph = ''
       silent = (w[n + 1] == 'H' && !vowel?(w[n + 2]))
-      if n > 0 && (w[n + 1] == 'N' || w[n + 1, 3] == 'NED')
-        silent = true
-      end
-      if n > 0 && w[n - 1] == 'D' && front_vowel?(w[n + 1])
-        silent = true
-      end
+      silent = true if n > 0 && w[n + 1] == 'N'
+      silent = true if n > 0 && w[n - 1] == 'D' && front_vowel?(w[n + 1])
       hard = (n > 0 && w[n - 1] == 'G')
       unless silent
-        if front_vowel?(w[n + 1]) && !hard
-          metaph = 'J'
-        else
-          metaph = 'K'
-        end
+        metaph = (front_vowel?(w[n + 1]) && !hard) ? 'J' : 'K'
       end
       metaph
     end
